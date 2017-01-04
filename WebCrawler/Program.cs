@@ -7,9 +7,6 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-
-
-
 namespace WebCrawler
 {
     using System;
@@ -24,27 +21,52 @@ namespace WebCrawler
     {
         public static void Main(string[] args)
         {
-            string site = "https://anthony-touchet.github.io";
-            string pageContent = null;
-            var myRequest = (HttpWebRequest)WebRequest.Create(site);    //Asking for the site
-            var myResponse = (HttpWebResponse)myRequest.GetResponse();  //Response to that request
-
-            using (var sr = new StreamReader(myResponse.GetResponseStream()))   //Get the page info
+            bool active = true;
+            while(active == true)
             {
-                pageContent = sr.ReadToEnd();
+                Console.WriteLine("What would you like?");                          //Get Input
+                var option = Console.ReadLine();
+                Console.WriteLine();
+
+                string site = "https://anthony-touchet.github.io";                  //Site name
+                string pageContent = null;
+                var myRequest = (HttpWebRequest)WebRequest.Create(site);            //Asking for the site
+                var myResponse = (HttpWebResponse)myRequest.GetResponse();          //Response to that request
+
+                using (var sr = new StreamReader(myResponse.GetResponseStream()))   //Get the page info
+                {
+                    pageContent = sr.ReadToEnd();
+                }
+
+                StreamWriter webToTextWriter = new StreamWriter(Environment.CurrentDirectory + "\\WebInfo.txt");    //Save out info
+                webToTextWriter.WriteLine(pageContent);                                                             //Write info to a text file.
+                webToTextWriter.Close();
+
+                StreamReader webToTextReader = new StreamReader(Environment.CurrentDirectory + "\\WebInfo.txt");    //Read file.
+                string line = null;     //Line that we are reading
+
+                switch (option)         //Choices
+                {
+                    case "Skills":
+                        FindSkills(line, webToTextReader);      //Prints out skills
+                        break;
+
+                    case "Links":
+                        FindLinks(line, webToTextReader, site); //Prints all valid linkc on the page
+                        break;
+
+                    case "Quit":
+                        active = false;                         //Quit Program
+                        break;
+
+                    default:
+                        Console.WriteLine("Invalid Input");     //Not Valid Input
+                        break;
+                }
+                webToTextReader.Close();
+                Console.WriteLine();
             }
-
-            StreamWriter webToTextWriter = new StreamWriter(Environment.CurrentDirectory + "\\WebInfo.txt");    //Save out info
-            webToTextWriter.WriteLine(pageContent);                                                             //Write info to a text file.
-            webToTextWriter.Close();
-           
-            StreamReader webToTextReader = new StreamReader(Environment.CurrentDirectory + "\\WebInfo.txt");    //Read file.
-            string line = null;    //Line that we are reading
-
-           // FindSkills(line, webToTextReader);
-            FindLinks(line, webToTextReader, site);
-
-            Console.ReadLine();
+            
         }
         
         static void FindSkills(string line, StreamReader sr)
