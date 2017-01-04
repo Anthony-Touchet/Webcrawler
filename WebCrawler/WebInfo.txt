@@ -1,0 +1,111 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Anthony Touchet</title>
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/github-dark.css">
+	<link rel="icon" type="image/png" href="images/Favicon.png" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script src="javascripts/respond.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <!--[if lt IE 8]>
+    <link rel="stylesheet" href="stylesheets/ie.css">
+    <![endif]-->
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+  </head>
+  <body>
+	<div id = "bodyDiv">
+      <div id="header">
+        <nav>
+          <li class="fork"><a href="https://github.com/Anthony-Touchet">View On GitHub</a></li>
+          <!--<li class="downloads"><a href="https://github.com/atouchetAIE/Anthony-Touchet/zipball/master">ZIP</a></li>
+          <li class="downloads"><a href="https://github.com/atouchetAIE/Production_Team/zipball/master">Production Team</a></li> -->
+        </nav>
+      </div><!-- end header -->
+
+    <div class="wrapper">
+      <section>
+        <div id="title">
+          <h1>Anthony Touchet</h1>
+		  
+          <p></p>
+          <hr>
+		  <div id="contactInfo">
+			<h2>Contact Info:</h2>
+			<span class="credits left">
+			<pre>				  
+Email: <small>anthonyjtouchet@gmail.com</small>
+<a href="https://www.linkedin.com/in/anthony-touchet-742184123"><u><span class="linkIcon"><img src = "images/Linkedin.png" style="width: 15px; height: 15px;"></span>Linkedin Profile</u></a>
+More Info On Request
+			</span></pre>
+		  </div>
+		  
+		  <div id="profilePic">
+			<img src="images/anthony.jpg"/ style="height: 250px">
+		  </div>
+        </div>
+		
+		<div id="white-space" ></div><!-- Spacing -->
+		
+		<br/>
+		<br/>
+		<!-- All Skills -->
+		<h1>Skills and Tool Skills</h1>
+		<div style="float: left; width: 50%;">
+			<ul>
+				<li>C++</li>
+				<li>C#</li>
+				<li>Unity</li>
+				<li>Python</li>
+				<li>HTML</li>
+				<li>CSS</li>
+				<li>Physics</li>
+				<li>Communication</li>
+				<li>Agile Design</li>
+				<li>Google Drive</li>
+			</ul>
+		</div>
+
+		<div style="float: left; width: 50%;">
+			<ul>
+				<li>Design Patterns</li>
+				<li>Microsoft Word</li>
+				<li>Unity 3D</li>
+				<li>Unit Testing</li>
+				<li>Power Point</li>
+				<li>Visual Studios</li>
+				<li>Documentation</li>
+				<li>Trello</li>
+				<li>StyleCop</li>
+				<li>Resharper</li>
+			</ul>
+		</div>	
+		
+		<div id="white-space"></div><!-- Spacing -->
+		<div id="white-space"></div><!-- Spacing -->
+		
+		<h1>Projects</h1>	<!-- Unity Projects -->
+		<table>
+			<tr>
+				<td><a href="projects/Team8H/Team8H.html"><img src = "projects\images\Team8H.png" class = "project"><br/>Team Eight Hour Game</a></td>
+				<td><a href="projects/Cursed/Cursed.html"><img src = "projects\images\Currsed2.png" class = "project"><br/>Cursed</a></td>
+			</tr>
+			<tr>
+				<td><a href="projects/GroupBoids/GroupBoids.html"><img src = "projects\images\TeamBoids.png" class = "project"><br/>Seeking Behaviors</a></td>
+				<td><a href="projects/Boids/Boids.html"><img src = "projects\images\BoidsCapture.PNG" class = "project"><br/>Boids Interpertation</a></td>
+			</tr>
+			<tr>
+				<td><a href="projects/Cloth/Cloth.html"><img src = "projects\images\Cloth1.png" ><br/>Cloth</a></td>
+			</tr>
+		</table>
+		
+		<div id="white-space" style = "height: 50px;"></div><!-- Spacing -->
+		
+		<h1>About Me</h1>
+		
+		<p>Currently, I am attending the Academy of Interactive Entertainment, getting an Advanced Degree of Professional Game Design and Programming. The Curriculum comprises of team projects, lessons in version control, lectures on the concepts of Computer programs, specifically to game programs. I am a second year student looking for a job in the industry and I am interested mostly in the logic decisions within video games. Boids, Pathfinding, and decision AI all spark my curiosity. I’m willing to
