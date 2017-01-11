@@ -17,31 +17,46 @@ namespace WebCrawler
 
     public class Program
     {
-        private static string _folderName = null;
+        public static string FolderName;
+
         public static void Main(string[] args)
         {
-            Console.WriteLine("Enter a site:");                          // Get Input
-            var site = Console.ReadLine();
-            Console.WriteLine();
+            var site = string.Empty;
+            var siteValid = false;
+
+            // Check To see if site is valid
+            while (!siteValid)
+            {
+                Console.WriteLine("Enter a site:");
+                site = Console.ReadLine();
+                Console.WriteLine();
+
+                if (IsSiteValid(site))
+                {
+                    siteValid = true;
+                }
+                else
+                {
+                    Console.WriteLine("Site Invalid!!");
+                }
+            }
           
             var active = true;
             while (active)
             {
-                Console.WriteLine("What would you like?");                          // Get Input
+                Console.WriteLine("What would you like?");
                 var option = Console.ReadLine();
                 Console.WriteLine();
-
-                string line = null;     // Line that we are reading
                 
                 // Choices
                 switch (option)         
                 {
                     case "Skills":
-                        FindSkills(line);      // Prints out skills
+                        FindSkills();      // Prints out skills
                         break;
 
                     case "Page Links":
-                        var validLinks = FindLinksOnPage(line, site); // Prints all valid linkc on the page
+                        var validLinks = FindLinksOnPage(site); // Prints all valid linkc on the page
                         foreach (var s in validLinks)
                         {
                             Console.WriteLine(s);
@@ -50,12 +65,29 @@ namespace WebCrawler
                         break;
 
                     case "All Links":
-                        var fullLinks = FindLinksOnFullSite(line, site); // Prints all valid linkc on the page
+                        var fullLinks = FindLinksOnFullSite(site); // Prints all valid linkc on the page
+                        var linkWriter = new StreamWriter(Environment.CurrentDirectory + "\\" + FolderName + "\\SiteLinks.txt");
+
                         foreach (var s in fullLinks)
                         {
-                            Console.WriteLine(s);
+                            linkWriter.WriteLine(s);
                         }
 
+                        Console.WriteLine("Task complete! Check: " + FolderName + "\\SiteLinks.txt");
+                        linkWriter.Close();
+                        break;
+
+                    case "Page Emails":
+                        var emailAddresses = FindEmailsOnPage(site);
+                        var emailWriter = new StreamWriter(Environment.CurrentDirectory + "\\" + FolderName + "\\PageEmails.txt");
+
+                        foreach (var s in emailAddresses)
+                        {
+                            emailWriter.WriteLine(s);
+                        }
+
+                        Console.WriteLine("Task complete! Check: " + FolderName + "\\PageEmails.txt");
+                        emailWriter.Close();
                         break;
 
                     case "Quit":
@@ -63,9 +95,24 @@ namespace WebCrawler
                         break;
 
                     case "New Site":
-                        Console.WriteLine("Enter a site:");                          // Get Input
-                        site = Console.ReadLine();
-                        Console.WriteLine();
+                        siteValid = false;
+                        while (!siteValid)
+                        {
+                            Console.WriteLine("Enter a site:");                          // Get Input
+                            site = Console.ReadLine();
+                            Console.WriteLine();
+
+                            // Check To see if site is valid
+                            if (IsSiteValid(site))      
+                            {
+                                siteValid = true;
+                            }
+                            else
+                            {
+                                Console.WriteLine("Site Invalid!!");
+                            }
+                        }
+
                         break;
 
                     default:
@@ -77,8 +124,9 @@ namespace WebCrawler
             }    
         }
         
-        public static void FindSkills(string line)
+        public static void FindSkills()
         {
+            string line;
             var skills = new List<string>();
             var sr = GetPageInfo("https://anthony-touchet.github.io");                  // Site name);
 
@@ -102,11 +150,12 @@ namespace WebCrawler
             }
         }
 
-        public static List<string> FindLinksOnPage(string line, string siteName)
+        public static List<string> FindLinksOnPage(string siteName)
         {
+            string line;
             var links = new List<string>();    // List of links
 
-            var sr = GetPageInfo(siteName);                  // Site name);
+            var sr = GetPageInfo(siteName);                  // Site name
 
             // Read each line
             while ((line = sr.ReadLine()) != null)
@@ -169,9 +218,9 @@ namespace WebCrawler
             return links;
         }
 
-        public static List<string> FindLinksOnFullSite(string line, string siteName)
+        public static List<string> FindLinksOnFullSite(string siteName)
         {
-            var links = FindLinksOnPage(line, siteName);    // List of links
+            var links = FindLinksOnPage(siteName);    // List of links
             var tempLinks = links.ToList();                     // Create Temp list
 
             // Weed out Outside sites
@@ -191,12 +240,64 @@ namespace WebCrawler
             {
                 var pageReader = GetPageInfo(l);                  // Site name
                 pageReader.Close();
-                var newPageLinks = FindLinksOnPage(line, l);
+                var newPageLinks = FindLinksOnPage(l);
                 
                 links.AddRange(newPageLinks);
             }
 
+            tempLinks = links.ToList();
+            links = new List<string>();
+            foreach (var l in tempLinks)
+            {
+                if (!links.Contains(l))
+                {
+                    links.Add(l);
+                }
+            }
+
             return links;
+        }
+
+        public static List<string> FindEmailsOnPage(string siteName)
+        {
+            var emails = new List<string>();
+
+            string line;
+            var siteInfo = GetPageInfo(siteName);
+
+            while ((line = siteInfo.ReadLine()) != null)
+            {
+                // These are the symbols we are using to find the info.
+                if (!line.Contains("@"))
+                {
+                    continue;
+                }
+
+                var email = line;
+                var firstHalf = email.Split('@')[0];
+                var secondHalf = email.Split('@')[1]; 
+
+                if (secondHalf.Contains('<'))
+                {
+                    secondHalf = secondHalf.Split('<')[0];
+                }
+
+                if (firstHalf.Contains('>'))
+                {
+                    firstHalf = firstHalf.Split('>').Last();
+                }
+
+                email = firstHalf + '@' + secondHalf;
+
+                if (email.Contains(':'))
+                {
+                    email = email.Split(':')[1];
+                }
+
+                emails.Add(email);
+            }
+
+            return emails;
         }
 
         public static StreamReader GetPageInfo(string site)
@@ -206,6 +307,7 @@ namespace WebCrawler
             var myResponse = (HttpWebResponse)myRequest.GetResponse();          // Response to that request
 
             // Get the page info
+            // ReSharper disable once AssignNullToNotNullAttribute
             using (var sr = new StreamReader(myResponse.GetResponseStream()))
             {
                 pageContent = sr.ReadToEnd();
@@ -214,22 +316,23 @@ namespace WebCrawler
             var siteArray = site.Split('/');
             foreach (var s in siteArray)
             {
-                if (s == "" || s == "https:" || s == "http:") continue;
-                _folderName = s.Split('.')[0];
+                if (s == string.Empty || s == "https:" || s == "http:")
+                {
+                    continue;
+                }
+
+                FolderName = s.Split('.')[0];
                 break;
             }
 
-            Directory.CreateDirectory(_folderName);
+            Directory.CreateDirectory(FolderName);
 
             // Writing to Text File
-            var webToTextWriter = new StreamWriter(Environment.CurrentDirectory + "\\" + _folderName + "\\Website.txt");     // Save out info
+            var webToTextWriter = new StreamWriter(Environment.CurrentDirectory + "\\" + FolderName + "\\Website.txt");     // Save out info
             webToTextWriter.WriteLine(pageContent);                                                                         // Write info to a text file.
             webToTextWriter.Close();
 
-            var webInfoWriter = new StreamWriter(Environment.CurrentDirectory + "\\" + _folderName + "\\WebInfo.txt");       // Save out info
-            webInfoWriter.Close();
-
-            var webToTextReader = new StreamReader(Environment.CurrentDirectory + "\\" + _folderName + "\\Website.txt");     // Read file.
+            var webToTextReader = new StreamReader(Environment.CurrentDirectory + "\\" + FolderName + "\\Website.txt");     // Read file.
             return webToTextReader;
         }
 
