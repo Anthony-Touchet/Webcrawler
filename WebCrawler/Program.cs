@@ -15,10 +15,22 @@ namespace WebCrawler
     using System.Linq;
     using System.Net;
 
+    /// <summary>
+    /// The program.
+    /// </summary>
     public class Program
     {
-        public static string FolderName;
+        /// <summary>
+        /// The Name of the folder we are working in.
+        /// </summary>
+        private static string folderName;
 
+        /// <summary>
+        /// The main.
+        /// </summary>
+        /// <param name="args">
+        /// The args.
+        /// </param>
         public static void Main(string[] args)
         {
             var site = string.Empty;
@@ -56,37 +68,44 @@ namespace WebCrawler
                         break;
 
                     case "Page Links":
-                        var validLinks = FindLinksOnPage(site); // Prints all valid linkc on the page
+                        var validLinks = FindLinksOnPage(site); // Finds all valid Links on the page
+                        var pageLinkWriter = new StreamWriter(Environment.CurrentDirectory + "\\" + folderName + "\\SiteLinks.txt");
+
+                        // Set New Valid links up
                         foreach (var s in validLinks)
                         {
-                            Console.WriteLine(s);
+                            pageLinkWriter.WriteLine(s);
                         }
+
+                        Console.WriteLine("Task complete! Check: " + folderName + "\\SiteLinks.txt");
+                        pageLinkWriter.Close();
 
                         break;
 
                     case "All Links":
-                        var fullLinks = FindLinksOnFullSite(site); // Prints all valid linkc on the page
-                        var linkWriter = new StreamWriter(Environment.CurrentDirectory + "\\" + FolderName + "\\SiteLinks.txt");
-
-                        foreach (var s in fullLinks)
+                        var fullLinks = FindLinksOnFullSite(site); // Gets all valid links from the main page and links from those links.
+                        var linkWriter = new StreamWriter(Environment.CurrentDirectory + "\\" + folderName + "\\SiteLinks.txt");
+                        
+                        // Write All Valid Links
+                        foreach (var l in fullLinks)
                         {
-                            linkWriter.WriteLine(s);
+                            linkWriter.WriteLine(l);
                         }
 
-                        Console.WriteLine("Task complete! Check: " + FolderName + "\\SiteLinks.txt");
+                        Console.WriteLine("Task complete! Check: " + folderName + "\\SiteLinks.txt");
                         linkWriter.Close();
                         break;
 
                     case "Page Emails":
-                        var emailAddresses = FindEmailsOnPage(site);
-                        var emailWriter = new StreamWriter(Environment.CurrentDirectory + "\\" + FolderName + "\\PageEmails.txt");
+                        var emailAddresses = FindEmailsOnPage(site);        // Finds all Emails on site
+                        var emailWriter = new StreamWriter(Environment.CurrentDirectory + "\\" + folderName + "\\PageEmails.txt");
 
-                        foreach (var s in emailAddresses)
+                        foreach (var eA in emailAddresses)
                         {
-                            emailWriter.WriteLine(s);
+                            emailWriter.WriteLine(eA);
                         }
 
-                        Console.WriteLine("Task complete! Check: " + FolderName + "\\PageEmails.txt");
+                        Console.WriteLine("Task complete! Check: " + folderName + "\\PageEmails.txt");
                         emailWriter.Close();
                         break;
 
@@ -123,7 +142,10 @@ namespace WebCrawler
                 Console.WriteLine();
             }    
         }
-        
+
+        /// <summary>
+        /// Finds skills on my personal Website.
+        /// </summary>
         public static void FindSkills()
         {
             string line;
@@ -150,6 +172,15 @@ namespace WebCrawler
             }
         }
 
+        /// <summary>
+        /// Finds links on page.
+        /// </summary>
+        /// <param name="siteName">
+        /// The site name.
+        /// </param>
+        /// <returns>
+        /// All Valid links on a page.
+        /// </returns>
         public static List<string> FindLinksOnPage(string siteName)
         {
             string line;
@@ -177,6 +208,7 @@ namespace WebCrawler
                         if (s.Contains("https://") || link.Contains("www."))
                         {
                             link = s;
+                            break;
                         }
                     }
 
@@ -218,15 +250,24 @@ namespace WebCrawler
             return links;
         }
 
+        /// <summary>
+        /// Finds links on full site.
+        /// </summary>
+        /// <param name="siteName">
+        /// The site name.
+        /// </param>
+        /// <returns>
+        /// List of valid sites another page from the home screen
+        /// </returns>
         public static List<string> FindLinksOnFullSite(string siteName)
         {
-            var links = FindLinksOnPage(siteName);    // List of links
+            var links = FindLinksOnPage(siteName);              // List of links
             var tempLinks = links.ToList();                     // Create Temp list
 
             // Weed out Outside sites
             foreach (var l in tempLinks)
             {
-                if (l.Contains(siteName))
+                if (l.Contains(folderName) || l.Contains(siteName.Split('/')[2]))
                 {
                     continue;
                 }
@@ -258,6 +299,15 @@ namespace WebCrawler
             return links;
         }
 
+        /// <summary>
+        /// Finds emails on page.
+        /// </summary>
+        /// <param name="siteName">
+        /// The site name.
+        /// </param>
+        /// <returns>
+        /// The list of valid sites that the function has found.
+        /// </returns>
         public static List<string> FindEmailsOnPage(string siteName)
         {
             var emails = new List<string>();
@@ -273,10 +323,14 @@ namespace WebCrawler
                     continue;
                 }
 
+                // Email will change over Time
                 var email = line;
-                var firstHalf = email.Split('@')[0];
-                var secondHalf = email.Split('@')[1]; 
 
+                // Split halfs so the proper information can be disected.
+                var firstHalf = email.Split('@')[0];
+                var secondHalf = email.Split('@')[1];
+
+                // Get rid of brackst and items inside of them.
                 if (secondHalf.Contains('<'))
                 {
                     secondHalf = secondHalf.Split('<')[0];
@@ -287,19 +341,34 @@ namespace WebCrawler
                     firstHalf = firstHalf.Split('>').Last();
                 }
 
-                email = firstHalf + '@' + secondHalf;
-
-                if (email.Contains(':'))
+                // If either are empty Just stop, its invalid
+                if (firstHalf == " " || firstHalf == string.Empty || secondHalf == " " || secondHalf == string.Empty)
                 {
-                    email = email.Split(':')[1];
+                    continue;
                 }
 
-                emails.Add(email);
+                email = firstHalf + '@' + secondHalf;   // Fuse the new halfs back together
+
+                if (email.Contains(':'))    // If for some reason it contains "Email:", split it and keep the back half
+                {
+                    email = email.Split(':').Last();
+                }
+
+                emails.Add(email);  // Add the email
             }
 
             return emails;
         }
 
+        /// <summary>
+        /// Get page info.
+        /// </summary>
+        /// <param name="site">
+        /// The site.
+        /// </param>
+        /// <returns>
+        /// The stream reader used to read the file.
+        /// </returns>
         public static StreamReader GetPageInfo(string site)
         {
             string pageContent;
@@ -321,21 +390,30 @@ namespace WebCrawler
                     continue;
                 }
 
-                FolderName = s.Split('.')[0];
+                folderName = s.Split('.')[0];
                 break;
             }
 
-            Directory.CreateDirectory(FolderName);
+            Directory.CreateDirectory(folderName);
 
             // Writing to Text File
-            var webToTextWriter = new StreamWriter(Environment.CurrentDirectory + "\\" + FolderName + "\\Website.txt");     // Save out info
+            var webToTextWriter = new StreamWriter(Environment.CurrentDirectory + "\\" + folderName + "\\Website.txt");     // Save out info
             webToTextWriter.WriteLine(pageContent);                                                                         // Write info to a text file.
             webToTextWriter.Close();
 
-            var webToTextReader = new StreamReader(Environment.CurrentDirectory + "\\" + FolderName + "\\Website.txt");     // Read file.
+            var webToTextReader = new StreamReader(Environment.CurrentDirectory + "\\" + folderName + "\\Website.txt");     // Read file.
             return webToTextReader;
         }
 
+        /// <summary>
+        /// This function checks to see if the site is valid.
+        /// </summary>
+        /// <param name="siteName">
+        /// The site name.
+        /// </param>
+        /// <returns>
+        /// If the site is valid, returns true. Else returns false.
+        /// </returns>
         public static bool IsSiteValid(string siteName)
         {
             try
